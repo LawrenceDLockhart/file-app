@@ -1,15 +1,10 @@
 package com.example.file_app;
 
-import com.example.file_app.File;
-import com.example.file_app.FileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-
 
 @Service
 public class FileService {
