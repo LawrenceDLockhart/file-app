@@ -11,25 +11,31 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.spring.annotation.RouteScope;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 import java.io.ByteArrayInputStream;
 
-public class FileGrid extends Grid<File> {
+@SpringComponent
+@RouteScope
+public class FileGrid extends Grid<FileEntity> {
 
     private final FileService service;
+    private final FileUploadForm uploadForm;
 
-    public FileGrid(FileService service) {
+    public FileGrid(FileService service, FileUploadForm fileUploadForm) {
         this.service = service;
+        this.uploadForm = fileUploadForm;
 
-        addColumn(File::getFileName).setHeader("File Name").setAutoWidth(true);
-        addColumn(File::getDescription).setHeader("Description").setAutoWidth(true);
+        addColumn(FileEntity::getFileName).setHeader("File Name").setAutoWidth(true);
+        addColumn(FileEntity::getDescription).setHeader("Description").setAutoWidth(true);
 
         addComponentColumn(file -> {
             Button downloadButton = new Button("Download");
             downloadButton.addClickListener(e -> downloadFile(file));
 
             Button editButton = new Button("Edit");
-            editButton.addClickListener(e -> openEditDialog(file));
+            editButton.addClickListener(e -> uploadForm.editFile(file));
 
             Button deleteButton = new Button("Delete");
             deleteButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -50,19 +56,19 @@ public class FileGrid extends Grid<File> {
         setItems(service.findAll());
     }
 
-    private void openEditDialog(File file) {
+    private void openEditDialog(FileEntity fileEntity) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Edit File Description");
 
         TextArea descriptionTextArea = new TextArea("Description");
-        descriptionTextArea.setValue(file.getDescription());
-        Binder<File> binder = new Binder<>(File.class);
-        binder.bind(descriptionTextArea, File::getDescription, File::setDescription);
-        binder.setBean(file);
+        descriptionTextArea.setValue(fileEntity.getDescription());
+        Binder<FileEntity> binder = new Binder<>(FileEntity.class);
+        binder.bind(descriptionTextArea, FileEntity::getDescription, FileEntity::setDescription);
+        binder.setBean(fileEntity);
 
         Button saveButton = new Button("Save", e -> {
             if (binder.isValid()) {
-                service.updateFile(file);
+                service.updateFile(fileEntity);
                 refreshGrid();
                 Notification.show("Description updated!");
                 dialog.close();
@@ -78,9 +84,9 @@ public class FileGrid extends Grid<File> {
         dialog.open();
     }
 
-    private void downloadFile(File file) {
-        StreamResource resource = new StreamResource(file.getFileName(),
-                () -> new ByteArrayInputStream(file.getFileData()));
+    private void downloadFile(FileEntity fileEntity) {
+        StreamResource resource = new StreamResource(fileEntity.getFileName(),
+                () -> new ByteArrayInputStream(fileEntity.getFileData()));
         resource.setCacheTime(0);
         resource.setContentType("application/octet-stream");
         UI.getCurrent().navigate(String.valueOf(resource));
