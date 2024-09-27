@@ -14,10 +14,8 @@ public class UploadView extends VerticalLayout {
     private final FileGrid fileGrid;
     private final FileUploadForm uploadForm;
 
-    @Autowired
-    private FileRepository fileRepository;
 
-    public UploadView(FileService service) {
+    public UploadView(FileService service, FileRepository fileRepository) {
         this.service = service;
         this.fileGrid = new FileGrid(service);
         this.uploadForm = new FileUploadForm(service);
@@ -29,13 +27,13 @@ public class UploadView extends VerticalLayout {
 
         add(new H1("File Uploads"), uploadForm, fileGrid);
         uploadForm.addFileUploadedListener(e -> {
-            loadFiles();
+            loadFiles(fileRepository);
         });
 
-        loadFiles();
+        loadFiles(fileRepository);
     }
 
-    private void loadFiles() {
+    private void loadFiles(FileRepository fileRepository) {
         List<File> files = fileRepository.findAll();
         fileGrid.setItems(files);
     }
