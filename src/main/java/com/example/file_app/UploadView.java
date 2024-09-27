@@ -4,7 +4,6 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Route("")
@@ -21,7 +20,7 @@ public class UploadView extends VerticalLayout {
         this.uploadForm = new FileUploadForm(service);
 
         setHeightFull();
-        setMaxWidth("500px");
+        setMaxWidth("100%:");
         addClassNames(LumoUtility.Margin.Horizontal.AUTO);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 

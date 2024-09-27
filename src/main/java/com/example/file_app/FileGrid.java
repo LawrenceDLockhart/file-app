@@ -38,7 +38,9 @@ public class FileGrid extends Grid<File> {
                 Notification.show("File deleted!");
             });
 
-            return new HorizontalLayout(downloadButton, editButton, deleteButton);
+            HorizontalLayout actionsLayout = new HorizontalLayout(downloadButton, editButton, deleteButton);
+            actionsLayout.setSpacing(true);
+            return actionsLayout;
         }).setHeader("Actions");
 
     }
@@ -58,7 +60,7 @@ public class FileGrid extends Grid<File> {
         binder.setBean(file);
 
         Button saveButton = new Button("Save", e -> {
-            if (binder.writeBeanIfValid(file)) {
+            if (binder.isValid()) {
                 service.updateFile(file);
                 refreshGrid();
                 Notification.show("Description updated!");
