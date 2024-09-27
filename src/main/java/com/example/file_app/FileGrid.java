@@ -1,11 +1,13 @@
 package com.example.file_app;
 
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -31,8 +33,6 @@ public class FileGrid extends Grid<FileEntity> {
         addColumn(FileEntity::getDescription).setHeader("Description").setAutoWidth(true);
 
         addComponentColumn(file -> {
-            Button downloadButton = new Button("Download");
-            downloadButton.addClickListener(e -> downloadFile(file));
 
             Button editButton = new Button("Edit");
             editButton.addClickListener(e -> uploadForm.editFile(file));
@@ -45,7 +45,8 @@ public class FileGrid extends Grid<FileEntity> {
                 Notification.show("File deleted!");
             });
 
-            HorizontalLayout actionsLayout = new HorizontalLayout(downloadButton, editButton, deleteButton);
+            HorizontalLayout actionsLayout = new HorizontalLayout(new FileDownload(file), editButton, deleteButton);
+            actionsLayout.setAlignItems(FlexComponent.Alignment.BASELINE);
             actionsLayout.setSpacing(true);
             return actionsLayout;
         }).setHeader("Actions");
@@ -84,12 +85,20 @@ public class FileGrid extends Grid<FileEntity> {
         dialog.open();
     }
 
-    private void downloadFile(FileEntity fileEntity) {
-        StreamResource resource = new StreamResource(fileEntity.getFileName(),
-                () -> new ByteArrayInputStream(fileEntity.getFileData()));
-        resource.setCacheTime(0);
-        resource.setContentType("application/octet-stream");
-        UI.getCurrent().navigate(String.valueOf(resource));
+    private static class FileDownload extends Anchor {
+        public FileDownload(FileEntity fileEntity) {
+            super();
+            add(VaadinIcon.DOWNLOAD.create());
+            StreamResource resource = new StreamResource(fileEntity.getFileName(),
+                    () -> new ByteArrayInputStream(fileEntity.getFileData()));
+            resource.setCacheTime(0);
+            resource.setContentType("application/octet-stream");
+            setHref(resource);
+            getElement().setAttribute("download", true);
+            setTitle("Download the file");
+        }
+
     }
+
 
 }
