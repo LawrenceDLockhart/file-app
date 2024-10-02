@@ -9,31 +9,30 @@ import java.util.List;
 @Service
 public class FileService {
 
-    private final FileRepository repository;
+    private final FileEntityRepository repository;
 
     @Autowired
-    public FileService(FileRepository repository) {
+    public FileService(FileEntityRepository repository) {
         this.repository = repository;
-
     }
 
-    public File saveFile(InputStream fileStream, String fileName, String description) throws IOException {
-        File fileEntity = new File();
+    public FileEntity saveFile(InputStream fileStream, String fileName, String description) throws IOException {
+        FileEntity fileEntity = new FileEntity();
         fileEntity.setFileName(fileName);
         fileEntity.setDescription(description);
         fileEntity.setFileData(fileStream.readAllBytes());
         return repository.save(fileEntity);
     }
 
-    public List<File> findAll() {
+    public List<FileEntity> findAll() {
         return repository.findAll();
     }
 
-    public void updateFile(File file) {
-        repository.save(file);
+    public void updateFile(FileEntity fileEntity) {
+        repository.save(fileEntity);
     }
 
-    public void deleteFile(File file) {
-        repository.delete(file);
+    public void deleteFile(FileEntity fileEntity) {
+        repository.delete(fileEntity);
     }
 }

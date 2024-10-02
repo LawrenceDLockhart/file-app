@@ -3,7 +3,7 @@ package com.example.file_app;
 import jakarta.persistence.*;
 
 @Entity
-public class File {
+public class FileEntity {
     @Id
     @GeneratedValue
     private Long id;

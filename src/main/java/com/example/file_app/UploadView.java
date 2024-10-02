@@ -2,9 +2,12 @@ package com.example.file_app;
 
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import java.util.List;
+
+import java.io.IOException;
 
 @Route("")
 public class UploadView extends VerticalLayout {
@@ -13,28 +16,39 @@ public class UploadView extends VerticalLayout {
     private final FileGrid fileGrid;
     private final FileUploadForm uploadForm;
 
-
-    public UploadView(FileService service, FileRepository fileRepository) {
+    public UploadView(FileService service, FileUploadForm fileUploadForm, FileGrid fileGrid) {
         this.service = service;
-        this.fileGrid = new FileGrid(service);
-        this.uploadForm = new FileUploadForm(service);
+        this.uploadForm = fileUploadForm;
+        this.fileGrid = fileGrid;
+        uploadForm.addOpenedChangeListener(e -> {
+            if (!e.isOpened()) {
+                fileGrid.refreshGrid();
+            }
+        });
+
+        Upload upload = new Upload();
+        MemoryBuffer buffer = new MemoryBuffer();
+        upload.setReceiver(buffer);
+        upload.addSucceededListener(event -> {
+            upload.clearFileList();
+
+            FileEntity fileEntity = new FileEntity();
+            fileEntity.setFileName(event.getFileName());
+            try {
+                fileEntity.setFileData(buffer.getInputStream().readAllBytes());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            uploadForm.editFile(fileEntity);
+        });
+
+        add(new H1("File Uploads"), upload, fileGrid);
+        fileGrid.refreshGrid();
 
         setHeightFull();
-        setMaxWidth("100%:");
         addClassNames(LumoUtility.Margin.Horizontal.AUTO);
         setDefaultHorizontalComponentAlignment(Alignment.CENTER);
 
-        add(new H1("File Uploads"), uploadForm, fileGrid);
-        uploadForm.addFileUploadedListener(e -> {
-            loadFiles(fileRepository);
-        });
-
-        loadFiles(fileRepository);
-    }
-
-    private void loadFiles(FileRepository fileRepository) {
-        List<File> files = fileRepository.findAll();
-        fileGrid.setItems(files);
     }
 
 }
