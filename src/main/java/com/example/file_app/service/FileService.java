@@ -1,5 +1,7 @@
-package com.example.file_app;
+package com.example.file_app.service;
 
+import com.example.file_app.entity.FileEntity;
+import com.example.file_app.repository.FileEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.io.IOException;

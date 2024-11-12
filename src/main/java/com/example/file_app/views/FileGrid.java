@@ -1,17 +1,15 @@
-package com.example.file_app;
+package com.example.file_app.views;
 
+import com.example.file_app.entity.FileEntity;
+import com.example.file_app.service.FileService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextArea;
-import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.spring.annotation.RouteScope;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -55,34 +53,6 @@ public class FileGrid extends Grid<FileEntity> {
 
     public void refreshGrid() {
         setItems(service.findAll());
-    }
-
-    private void openEditDialog(FileEntity fileEntity) {
-        Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Edit File Description");
-
-        TextArea descriptionTextArea = new TextArea("Description");
-        descriptionTextArea.setValue(fileEntity.getDescription());
-        Binder<FileEntity> binder = new Binder<>(FileEntity.class);
-        binder.bind(descriptionTextArea, FileEntity::getDescription, FileEntity::setDescription);
-        binder.setBean(fileEntity);
-
-        Button saveButton = new Button("Save", e -> {
-            if (binder.isValid()) {
-                service.updateFile(fileEntity);
-                refreshGrid();
-                Notification.show("Description updated!");
-                dialog.close();
-            } else {
-                Notification.show("Please fix the validation errors");
-            }
-        });
-        Button cancelButton = new Button("Cancel", e -> dialog.close());
-
-        VerticalLayout dialogLayout = new VerticalLayout(descriptionTextArea, saveButton, cancelButton);
-        dialogLayout.setSpacing(true);
-        dialog.add(dialogLayout);
-        dialog.open();
     }
 
     private static class FileDownload extends Anchor {

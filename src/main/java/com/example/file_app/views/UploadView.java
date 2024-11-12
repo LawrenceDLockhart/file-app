@@ -1,5 +1,7 @@
-package com.example.file_app;
+package com.example.file_app.views;
 
+import com.example.file_app.entity.FileEntity;
+import com.example.file_app.service.FileService;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
